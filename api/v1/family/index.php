@@ -13,7 +13,7 @@ switch ($method) {
 	case 'POST':
         $request_data = $_POST;
         //print_r($request_data);
-        $ops_type = (string) isset($request_data['ops_type']) ? $request_data['ops_type'] :  null;
+        $ops_type = (string) isset($request_data['ops_type']) ? filter_var($request_data['ops_type'], FILTER_SANITIZE_STRING) :  null;
         //echo $ops_type;
         switch ($ops_type){
             case 'register':

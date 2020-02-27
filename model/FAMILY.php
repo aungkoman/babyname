@@ -10,6 +10,7 @@ class FAMILY{
         }
         private function filterInt($str){
                 $newstr = filter_var($str, FILTER_VALIDATE_INT);
+                if($newstr == "") return_fail("ini have to be provided");
                 return $newstr;
         }
         public function register($data){
@@ -61,13 +62,16 @@ class FAMILY{
                 //$books = R::getAll('SELECT * FROM book WHERE price < ? ',[ 50 ] ); # raw query method
                 $lastId = isset($data['lastId']) ? $this->filterInt($data['lastId']) : 0 ;
                 $limit = isset($data['limit']) ? $this->filterInt($data['limit']) : 10;
-                $familys = R::getAll('SELECT * FROM family WHERE id > ? LIMIT ?',[$lastId,$limit]);
-                if(count($familys) > 0){
-                        return_success("family->selectAll",$familys);
+                if($lastId != "" || $limit != "" ){
+                        $familys = R::getAll('SELECT * FROM family WHERE id > ? LIMIT ?',[$lastId,$limit]);
+                        if(count($familys) > 0){
+                                return_success("family->selectAll",$familys);
+                        } else{
+                                return_fail("family->selectAll",'no data');
+                        }
                 } else{
-                        return_fail("family->selectAll",'no data');
+                        return_fail("family->selectAll","lastId and limit have to be int ".$lastId." : ".$limit);
                 }
-                
         }
         public function selectByGender($data){
                 //$books = R::getAll('SELECT * FROM book WHERE price < ? ',[ 50 ] ); # raw query method
