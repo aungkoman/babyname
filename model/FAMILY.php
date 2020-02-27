@@ -4,12 +4,22 @@ class FAMILY{
         public function __construct(){
                 $this->family = R::dispense('family');
         }
+        private function filterString($str){
+                $newstr = filter_var($str, FILTER_SANITIZE_STRING);
+                return $newstr;
+        }
+        private function filterInt($str){
+                $newstr = filter_var($str, FILTER_VALIDATE_INT);
+                return $newstr;
+        }
         public function register($data){
-                $this->family->dad = isset($data['dad']) ? $data['dad'] : null;
-                $this->family->mom = isset($data['mom']) ? $data['mom'] : null;
-                $this->family->baby = isset($data['baby']) ? $data['baby'] : null;
-                $this->family->gender = isset($data['gender']) ? $data['gender'] : null;
-                $this->family->birthdate = isset($data['birthdate']) ? $data['birthdate'] : null;
+                $this->family->dad = isset($data['dad']) ? $this->filterString($data['dad']) : null;
+                $this->family->mom = isset($data['mom']) ? $this->filterString($data['mom']) : null;
+                $this->family->baby = isset($data['baby']) ? $this->filterString($data['baby']) : null;
+                $this->family->gender = isset($data['gender']) ? $this->filterString($data['gender']) : null;
+                $this->family->birthdate = isset($data['birthdate']) ? $this->filterString($data['birthdate']) : null;
+
+
                 try{
                         $id = R::store($this->family);
                         return_success("family->register",$id);
@@ -17,10 +27,40 @@ class FAMILY{
                         return_fail("family->register",$e->getMessage());
                 }
         }
+        public function update($data){
+                $id = isset($data['id']) ? $this->filterInt($data['id']) : null;
+                if($id == null ) return_fail("family->update","id have to be provided");
+                try{
+                        $this->family = R::load('family',$id);
+                }catch(Exception $e){
+                        return_fail("family->update",$e->getMessage());
+                }
+                if($this->family->id == 0) return_fail("family->update","no record to update");
+                $this->family->dad = isset($data['dad']) ? $data['dad'] : $this->family->dad;
+                $this->family->mom = isset($data['mom']) ? $data['mom'] : $this->family->mom;
+                $this->family->baby = isset($data['baby']) ? $data['baby'] : $this->family->baby;
+                $this->family->gender = isset($data['gender']) ? $data['gender'] : $this->family->gender;
+                $this->family->birthdate = isset($data['birthdate']) ? $data['birthdate'] : $this->family->birthdate;
+                R::store($this->family);
+                return_success("family->update","updated");
+        }
+        public function delete($data){
+                $id = isset($data['id']) ? $this->filterInt($data['id']) : null;
+                if($id == null ) return_fail("family->delete","id have to be provided");
+                try{
+                        $this->family = R::load('family',$id);
+                }catch(Exception $e){
+                        return_fail("family->update",$e->getMessage());
+                }
+                if($this->family->id == 0) return_fail("family->delete","no record to delete");
+                // R::trash( $post ); # delete record (bean)
+                R::trash($this->family);
+                return_success("family->success","deleted");
+        }
         public function selectAll($data){
                 //$books = R::getAll('SELECT * FROM book WHERE price < ? ',[ 50 ] ); # raw query method
-                $lastId = isset($data['lastId']) ? $data['lastId'] : 0 ;
-                $limit = isset($data['limit']) ? $data['limit'] : 10;
+                $lastId = isset($data['lastId']) ? $this->filterInt($data['lastId']) : 0 ;
+                $limit = isset($data['limit']) ? $this->filterInt($data['limit']) : 10;
                 $familys = R::getAll('SELECT * FROM family WHERE id > ? LIMIT ?',[$lastId,$limit]);
                 if(count($familys) > 0){
                         return_success("family->selectAll",$familys);
@@ -31,9 +71,9 @@ class FAMILY{
         }
         public function selectByGender($data){
                 //$books = R::getAll('SELECT * FROM book WHERE price < ? ',[ 50 ] ); # raw query method
-                $lastId = isset($data['lastId']) ? $data['lastId'] : 0 ;
-                $limit = isset($data['limit']) ? $data['limit'] : 10;
-                $gender = isset($data['gender']) ? $data['gender'] : null;
+                $lastId = isset($data['lastId']) ? $this->filterInt($data['lastId']) : 0 ;
+                $limit = isset($data['limit']) ? $this->filterInt($data['limit']) : 10;
+                $gender = isset($data['gender']) ? $this->filterString($data['gender']) : null;
                 $familys = R::getAll('SELECT * FROM family WHERE id > ? AND gender = ?  LIMIT ?',[$lastId,$gender,$limit]);
                 if(count($familys) > 0){
                         return_success("family->selectByGender",$familys);
@@ -44,9 +84,9 @@ class FAMILY{
         }
         public function selectByBirthdate($data){
                 //$books = R::getAll('SELECT * FROM book WHERE price < ? ',[ 50 ] ); # raw query method
-                $lastId = isset($data['lastId']) ? $data['lastId'] : 0 ;
-                $limit = isset($data['limit']) ? $data['limit'] : 10;
-                $birthdate = isset($data['birthdate']) ? $data['birthdate'] : null;
+                $lastId = isset($data['lastId']) ? $this->filterInt($data['lastId']) : 0 ;
+                $limit = isset($data['limit']) ? $this->filterInt($data['limit']) : 10;
+                $birthdate = isset($data['birthdate']) ? $this->filterString($data['birthdate']) : null;
                 $familys = R::getAll('SELECT * FROM family WHERE id > ? AND birthdate = ?  LIMIT ?',[$lastId,$birthdate,$limit]);
                 if(count($familys) > 0){
                         return_success("family->selectByBirthdate",$familys);
@@ -56,18 +96,16 @@ class FAMILY{
                 
         }
         public function selectByGenderBirthdate($data){
-                //$books = R::getAll('SELECT * FROM book WHERE price < ? ',[ 50 ] ); # raw query method
-                $lastId = isset($data['lastId']) ? $data['lastId'] : 0 ;
-                $limit = isset($data['limit']) ? $data['limit'] : 10;
-                $gender = isset($data['gender']) ? $data['gender'] : null;
-                $birthdate = isset($data['birthdate']) ? $data['birthdate'] : null;
+                $lastId = isset($data['lastId']) ? $this->filterInt($data['lastId']) : 0 ;
+                $limit = isset($data['limit']) ? $this->filterInt($data['limit']) : 10;
+                $gender = isset($data['gender']) ? $this->filterString($data['gender']) : null;
+                $birthdate = isset($data['birthdate']) ? $this->filterString($data['birthdate']) : null;
                 $familys = R::getAll('SELECT * FROM family WHERE id > ? AND gender = ? AND birthdate = ? LIMIT ?',[$lastId,$gender,$birthdate,$limit]);
                 if(count($familys) > 0){
                         return_success("family->selectByGender",$familys);
                 } else{
                         return_fail("family->selectByGender",'no data for gender '.$gender.' and birthdate '.$birthdate);
                 }
-                
         }
         public function guess($data){
                 $familys = R::getAll('SELECT * FROM family');
@@ -79,7 +117,7 @@ class FAMILY{
                 }
         }
         public function guessForGender($data){
-                $gender = isset($data['gender']) ? $data['gender'] : null;
+                $gender = isset($data['gender']) ? $this->filterString($data['gender']) : null;
                 $familys = R::getAll('SELECT * FROM family WHERE gender = ?',[$gender]);
                 if(count($familys) > 0 ) {
                         $suggectedNames = $this->guessWithData($data,$familys);
@@ -89,7 +127,7 @@ class FAMILY{
                 }
         }
         public function guessForBirthdate($data){
-                $birthdate = isset($data['birthdate']) ? $data['birthdate'] : null;
+                $birthdate = isset($data['birthdate']) ? $this->filterString($data['birthdate']) : null;
                 $familys = R::getAll('SELECT * FROM family WHERE birthdate = ?',[$birthdate]);
                 if(count($familys) > 0 ) {
                         $suggectedNames = $this->guessWithData($data,$familys);
@@ -99,8 +137,8 @@ class FAMILY{
                 }
         }
         public function guessForGenderBirthdate($data){
-                $gender = isset($data['gender']) ? $data['gender'] : null;
-                $birthdate = isset($data['birthdate']) ? $data['birthdate'] : null;
+                $gender = isset($data['gender']) ? $this->filterString($data['gender']) : null;
+                $birthdate = isset($data['birthdate']) ? $this->filterString($data['birthdate']) : null;
                 $familys = R::getAll('SELECT * FROM family WHERE gender = ? AND  birthdate = ?',[$gender,$birthdate]);
                 if(count($familys) > 0 ) {
                         $suggectedNames = $this->guessWithData($data,$familys);
@@ -122,8 +160,8 @@ class FAMILY{
                 $diffArr = array();
 
                 #1
-                $dad = isset($data['dad']) ? $data['dad'] : null;
-                $mom = isset($data['mom']) ? $data['mom'] : null;
+                $dad = isset($data['dad']) ? $this->filterString($data['dad']) : null;
+                $mom = isset($data['mom']) ? $this->filterString($data['mom']) : null;
                 if($dad == null || $mom == null ) return_fail("family->guess","dad and mom names have to be provided");
 
                 #2

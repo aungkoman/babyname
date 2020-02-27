@@ -21,4 +21,14 @@ echo (min(12, 4, 4, 97, 26));
 
 $index = array_keys($numArr, min($numArr));
 print_r($index);
+
+
+$num = "4ks5jdf;";
+$newstr = filter_var($num, FILTER_VALIDATE_INT);
+if(filter_var($num, FILTER_VALIDATE_INT)){
+        echo "num is int";
+} else{
+        echo "num is not int";
+}
+echo "num 23 is ".$newstr;
 ?>
