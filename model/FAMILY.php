@@ -129,6 +129,7 @@ class FAMILY{
         public function guessForGender($data){
                 $gender = isset($data['gender']) ? $this->filterString($data['gender']) : null;
                 $familys = R::getAll('SELECT * FROM family WHERE gender = ?',[$gender]);
+                //echo json_encode($familys);
                 if(count($familys) > 0 ) {
                         $suggectedNames = $this->guessWithData($data,$familys);
                         return_success("family->guessForGender",$suggectedNames);
@@ -172,6 +173,8 @@ class FAMILY{
                 #1
                 $dad = isset($data['dad']) ? $this->filterString($data['dad']) : null;
                 $mom = isset($data['mom']) ? $this->filterString($data['mom']) : null;
+                //echo "dad is ".$dad;
+                //echo "mom is ".$mom;
                 if($dad == null || $mom == null ) return_fail("family->guess","dad and mom names have to be provided");
 
                 #2
@@ -179,6 +182,7 @@ class FAMILY{
                 //print_r($familys);
 
                 #3
+
                 for($i = 0 ; $i < count($familys) ; $i++){
                         //echo "loop i = ".$i;
                         //print_r($familys[$i]);
@@ -189,15 +193,24 @@ class FAMILY{
                         $dadDiff = 0;
                         $momDiff = 0;
                         $totalDiff = 0 ;
-                        for($j = 0; $j < strlen($dadData); $j++){
-                                if($j >= strlen($dad) ) continue;
-                                $dadDiff += abs( $this->codePoint($dadData[$j]) - $this->codePoint($dad[$j]) );
+                        # use mb_strlen instead strlen cause we have to deal with utf8 encoded languange like myanmar 
+                        for($j = 0; $j < mb_strlen($dadData); $j++){
+                                if($j >= mb_strlen($dad) ) continue;
+                                //echo "codePoint for dadData[$j] is ".$this->codePoint($dadData[$j]);
+                                //echo "codePoint for dad[$j] is ".$this->codePoint($dad[$j]);
+                                // mb_substr($dad,$i,1);
+                                # use mb_substr instead normal index to get character 
+                                # mb_substr($dad,$i,1);
+                                //$dadDiff += abs( $this->codePoint($dadData[$j]) - $this->codePoint($dad[$j]) );
+                                $dadDiff += abs( $this->codePoint(mb_substr($dadData,$j,1)) - $this->codePoint(mb_substr($dad,$j,1)) );
                         }
                         for($j = 0; $j < strlen($momData); $j++){
                                 if($j >= strlen($mom) ) continue;
-                                $momDiff += abs( $this->codePoint($momData[$j]) - $this->codePoint($mom[$j]) );
+                                //$momDiff += abs( $this->codePoint($momData[$j]) - $this->codePoint($mom[$j]) );
+                                $momDiff += abs( $this->codePoint(mb_substr($momData,$j,1)) - $this->codePoint(mb_substr($mom,$j,1)) );
                         }
                         $totalDiff = $dadDiff + $momDiff;
+                        //echo "diff ".$dadDiff." : ".$momDiff." = " .$totalDiff;
                         $diffArr[$i] = $totalDiff;
                 }
 
@@ -219,7 +232,7 @@ class FAMILY{
                 }
 
                 #5
-                $maxResultCount = 2 ; // that's max name count
+                $maxResultCount = 9 ; // that's max name count
                 $suggectedNames = array();
                 //print_r($oldIndex);
 

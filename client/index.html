@@ -42,6 +42,9 @@
                                 background-color: #f2f2f2;
                                 padding: 20px;
                               }
+                              a{
+                                      margin-top: 5px;
+                              }
                               a:link {
                                 color: blue;
                                 text-transform: uppercase;
@@ -66,11 +69,11 @@
                         <fieldset>
                                 <legend>Insert Form</legend>
                                 <label for="dadInput">Dad</label><br>
-                                <input type="text" name="dad" id="dadInput"  required/><br>
+                                <input type="text" name="dad" id="dadInput" placeholder="Dad's name"  required/><br>
                                 <label for="momInput">Mom</label><br>
-                                <input type="text" name="mom" id="momInput" required /><br>
+                                <input type="text" name="mom" id="momInput" placeholder="Mom's name"   required /><br>
                                 <label for="babyInput">Baby</label><br>
-                                <input type="text" name="baby" id="babyInput" required /><br>
+                                <input type="text" name="baby" id="babyInput" placeholder="Baby's name"   required /><br>
                                 <label for="genderInput">Gender</label><br>
                                 <select name="gender" id="genderInput" required>
                                         <option value="">-- choose gender --</option>
@@ -88,7 +91,7 @@
                                         <option value="fri">Fri</option>
                                         <option value="sat">Sat</option>
                                 </select><br>
-                                <input type="submit" value="Submit">
+                                <input type="submit" value="Register Family">
                         </fieldset>
                 </form>
                 
@@ -99,19 +102,17 @@
                                 <input type="text" name="dad" id="dadQueryInput"  required/><br>
                                 <label for="momQueryInput">Mom</label><br>
                                 <input type="text" name="mom" id="momQueryInput" required /><br>
-                                <label for="genderQueryInput">Gender</label><br>
+                                <label for="genderQueryInput">Baby</label><br>
                                 <select name="gender" id="genderQueryInput" required>
                                         <option value="">-- choose gender --</option>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
+                                        <option value="male">Son</option>
+                                        <option value="female">Daughter</option>
                                 </select><br>
-                                <input type="submit" value="Submit">
+                                <input type="submit" value="Generate Baby Name">
                         </fieldset>
                 </form>
                 <p id="statusPara" class="hidden">status...</p>
-                <br>
                 <a href="#" id="showFamilyInsertFormLink" class="hidden">Insert Form</a>
-                <br>
                 <a href="#" id="showQueryFormLink" class="hidden">Query Form</a>
                 <script>
                        console.log("baby is ready");
