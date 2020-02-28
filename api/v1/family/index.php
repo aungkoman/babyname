@@ -6,7 +6,6 @@ include('../../../lib/rb.php');
 include('../../../config/conn.php');
 include('../../../config/return_function.php');
 include('../../../model/FAMILY.php');
-
 $family = new FAMILY();
 $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {

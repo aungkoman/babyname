@@ -6,6 +6,7 @@ class FAMILY{
         }
         private function filterString($str){
                 $newstr = filter_var($str, FILTER_SANITIZE_STRING);
+                if($newstr == "") return_fail("string have to be provided");
                 return $newstr;
         }
         private function filterInt($str){
@@ -20,6 +21,11 @@ class FAMILY{
                 $this->family->gender = isset($data['gender']) ? $this->filterString($data['gender']) : null;
                 $this->family->birthdate = isset($data['birthdate']) ? $this->filterString($data['birthdate']) : null;
 
+                // checking duplicate entry
+                $familys = R::getAll('SELECT * FROM family WHERE dad = ? AND mom = ? AND baby = ? AND gender = ? AND birthdate = ? ',[$this->family->dad,$this->family->mom,$this->family->baby,$this->family->gender,$this->family->birthdate]);
+                if(count($familys) > 0){
+                        return_success("family->register : already registred",$familys);
+                } 
 
                 try{
                         $id = R::store($this->family);
